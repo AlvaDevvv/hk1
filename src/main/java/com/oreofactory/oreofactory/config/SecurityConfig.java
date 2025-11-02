@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers("/sales/summary/weekly").hasAnyAuthority("ROLE_CENTRAL", "ROLE_BRANCH")
                         .requestMatchers("/sales/delete/**").hasAuthority("ROLE_CENTRAL")
                         .requestMatchers("/sales/**").hasAnyAuthority("ROLE_CENTRAL", "ROLE_BRANCH")

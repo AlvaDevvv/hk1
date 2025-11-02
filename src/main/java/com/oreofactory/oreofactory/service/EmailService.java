@@ -1,10 +1,12 @@
 package com.oreofactory.oreofactory.service;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -14,34 +16,45 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Async
-    public void sendReportEmail(String to, String summary, SalesAggregationService.SalesAggregates aggregates) {
+    public void sendPremiumReport(String to, String subject, String htmlContent, byte[] pdfAttachment) {
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(to);
-            message.setSubject("Resumen Semanal de Ventas Oreo");
-            message.setText(createEmailContent(summary, aggregates));
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(htmlContent, true); // true = HTML content
+
+            if (pdfAttachment != null) {
+                helper.addAttachment("reporte_oreo_premium.pdf",
+                        new ByteArrayResource(pdfAttachment), "application/pdf");
+            }
 
             mailSender.send(message);
-            log.info("Report email sent successfully to: {}", to);
+            log.info("Email premium enviado exitosamente a: {}", to);
 
-        } catch (Exception e) {
-            log.error("Failed to send report email to: {}", to, e);
-            throw new RuntimeException("Email service unavailable", e);
+        } catch (MessagingException e) {
+            log.error("Error enviando email premium a: {}", to, e);
+            throw new RuntimeException("Error enviando email premium", e);
         }
     }
 
-    private String createEmailContent(String summary, SalesAggregationService.SalesAggregates aggregates) {
-        return String.format(
-                "RESUMEN SEMANAL DE VENTAS OREO\n\n" +
-                        "DATOS PRINCIPALES:\n" +
-                        "• Total de unidades: %d\n" +
-                        "• Ingresos totales: $%.2f\n" +
-                        "• SKU más vendido: %s\n" +
-                        "• Sucursal líder: %s\n\n" +
-                        "ANÁLISIS GENERADO POR IA:\n%s\n\n" +
-                        "Este es un reporte automático generado por el Sistema de Ventas Oreo.",
-                aggregates.getTotalUnits(), aggregates.getTotalRevenue(), aggregates.getTopSku(), aggregates.getTopBranch(), summary
-        );
+    // Mantener el método existente para emails simples
+    public void sendSimpleEmail(String to, String subject, String text) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
+
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(text, false); // false = texto plano
+
+            mailSender.send(message);
+            log.info("Email simple enviado exitosamente a: {}", to);
+
+        } catch (MessagingException e) {
+            log.error("Error enviando email simple a: {}", to, e);
+            throw new RuntimeException("Error enviando email", e);
+        }
     }
 }

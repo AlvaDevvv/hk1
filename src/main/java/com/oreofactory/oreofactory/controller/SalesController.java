@@ -1,8 +1,10 @@
 package com.oreofactory.oreofactory.controller;
 
+import com.oreofactory.oreofactory.dto.request.PremiumReportRequestDTO;
 import com.oreofactory.oreofactory.dto.request.SaleRequestDTO;
+import com.oreofactory.oreofactory.dto.response.PremiumReportResponseDTO;
 import com.oreofactory.oreofactory.model.entity.Sale;
-import com.oreofactory.oreofactory.event.ReportRequestedEvent;
+import com.oreofactory.oreofactory.service.PremiumReportService;
 import com.oreofactory.oreofactory.service.SalesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -23,6 +25,7 @@ public class SalesController {
 
     private final SalesService salesService;
     private final ApplicationEventPublisher eventPublisher;
+    private final PremiumReportService premiumReportService;
 
     @PostMapping
     public ResponseEntity<Sale> createSale(@RequestBody SaleRequestDTO request, Authentication authentication) {
@@ -59,18 +62,15 @@ public class SalesController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/summary/weekly")
-    public ResponseEntity<Void> generateWeeklySummary(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(required = false) String branch,
+    @PostMapping("/summary/weekly/premium")
+    public ResponseEntity<PremiumReportResponseDTO> generatePremiumWeeklySummary(
+            @RequestBody PremiumReportRequestDTO request,
             Authentication authentication) {
 
-        // Publicar evento para procesamiento asíncrono
-        eventPublisher.publishEvent(new ReportRequestedEvent(
-                this, startDate, endDate, branch, authentication.getName()
-        ));
+        PremiumReportResponseDTO response = premiumReportService.generatePremiumReport(
+                request, authentication.getName()
+        );
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 }

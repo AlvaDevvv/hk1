@@ -1,15 +1,39 @@
 package com.oreofactory.oreofactory.service;
 
 import com.oreofactory.oreofactory.model.entity.Sale;
+import com.oreofactory.oreofactory.repository.SaleRepository;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class SalesAggregationService {
+
+    private final SaleRepository saleRepository;
+
+    // ✅ AGREGAR ESTE MÉTODO
+    public SalesAggregates getAggregates(LocalDate startDate, LocalDate endDate, String branch) {
+        LocalDateTime start = startDate != null ? startDate.atStartOfDay() : LocalDateTime.of(1970, 1, 1, 0, 0);
+        LocalDateTime end = endDate != null ? endDate.atTime(LocalTime.MAX) : LocalDateTime.now();
+
+        List<Sale> sales;
+        if (branch != null && !branch.trim().isEmpty()) {
+            sales = saleRepository.findByBranchAndSoldAtBetween(branch, start, end);
+        } else {
+            sales = saleRepository.findBySoldAtBetween(start, end);
+        }
+
+        return calculateAggregates(sales);
+    }
+
 
     public SalesAggregates calculateAggregates(List<Sale> sales) {
         if (sales.isEmpty()) {

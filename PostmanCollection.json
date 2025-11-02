@@ -1,0 +1,602 @@
+{
+  "info": {
+    "name": "Oreo Factory API",
+    "description": "API para gestión de ventas de Oreo con integración de IA para generación de reportes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "centralUser",
+      "value": "admin_central",
+      "type": "string"
+    },
+    {
+      "key": "branchUser",
+      "value": "user_branch",
+      "type": "string"
+    },
+    {
+      "key": "password",
+      "value": "Password123",
+      "type": "string"
+    },
+    {
+      "key": "saleId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Register Central User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{centralUser}}\",\n  \"email\": \"central@oreo.com\",\n  \"password\": \"{{password}}\",\n  \"role\": \"ROLE_CENTRAL\",\n  \"branch\": \"Central\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Branch User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{branchUser}}\",\n  \"email\": \"branch@oreo.com\",\n  \"password\": \"{{password}}\",\n  \"role\": \"ROLE_BRANCH\",\n  \"branch\": \"Miraflores\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Central User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has auth token\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.token).to.not.be.undefined;",
+                  "    pm.collectionVariables.set(\"authToken\", jsonData.token);",
+                  "    console.log(\"Token saved: \" + jsonData.token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{centralUser}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Branch User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{branchUser}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📊 Sales Management",
+      "item": [
+        {
+          "name": "Create Sale - Central",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Sale created successfully\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set(\"saleId\", jsonData.id);",
+                  "    console.log(\"Sale ID saved: \" + jsonData.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"OREO_CLASSIC_12\",\n  \"units\": 25,\n  \"price\": 1.99,\n  \"branch\": \"Miraflores\",\n  \"soldAt\": \"2025-01-11T10:30:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sales",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Sale - Double Stuf",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"OREO_DOUBLE_STUF_12\",\n  \"units\": 15,\n  \"price\": 2.49,\n  \"branch\": \"San Isidro\",\n  \"soldAt\": \"2025-01-11T14:20:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sales",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Sale - Golden",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"OREO_GOLDEN_12\",\n  \"units\": 30,\n  \"price\": 2.99,\n  \"branch\": \"Miraflores\",\n  \"soldAt\": \"2025-01-11T16:45:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sales",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Sales",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales?page=0&size=10&sort=soldAt,desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                },
+                {
+                  "key": "sort",
+                  "value": "soldAt,desc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sales with Filters",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales?startDate=2025-01-01&endDate=2025-01-11&branch=Miraflores&page=0&size=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2025-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-01-11"
+                },
+                {
+                  "key": "branch",
+                  "value": "Miraflores"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sale by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/{{saleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "{{saleId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Sale",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"OREO_CLASSIC_12\",\n  \"units\": 35,\n  \"price\": 1.99,\n  \"branch\": \"Miraflores\",\n  \"soldAt\": \"2025-01-11T10:30:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sales/{{saleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "{{saleId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Sale (Central Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/delete/{{saleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "delete", "{{saleId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🤖 AI Reports",
+      "item": [
+        {
+          "name": "Generate Weekly Summary",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Report processing started\", function () {",
+                  "    pm.response.to.have.status(202);",
+                  "    console.log(\"Report is being processed asynchronously\");",
+                  "    console.log(\"Check email for the generated report\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/summary/weekly?startDate=2025-01-01&endDate=2025-01-07&branch=Miraflores",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "summary", "weekly"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2025-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-01-07"
+                },
+                {
+                  "key": "branch",
+                  "value": "Miraflores"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Weekly Summary - All Branches",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/summary/weekly?startDate=2025-01-01&endDate=2025-01-07",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "summary", "weekly"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2025-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-01-07"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔄 Test Flow - Complete Sequence",
+      "item": [
+        {
+          "name": "1. Register Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// This is the complete test flow",
+                  "console.log(\"Starting complete test flow...\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"username\": \"{{centralUser}}\",\n    \"email\": \"central@oreo.com\",\n    \"password\": \"{{password}}\",\n    \"role\": \"ROLE_CENTRAL\",\n    \"branch\": \"Central\"\n  },\n  {\n    \"username\": \"{{branchUser}}\",\n    \"email\": \"branch@oreo.com\",\n    \"password\": \"{{password}}\",\n    \"role\": \"ROLE_BRANCH\", \n    \"branch\": \"Miraflores\"\n  }\n]"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Login and Get Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{centralUser}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Create Multiple Sales",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"sku\": \"OREO_CLASSIC_12\",\n    \"units\": 25,\n    \"price\": 1.99,\n    \"branch\": \"Miraflores\",\n    \"soldAt\": \"2025-01-11T10:30:00Z\"\n  },\n  {\n    \"sku\": \"OREO_DOUBLE_STUF_12\",\n    \"units\": 15,\n    \"price\": 2.49,\n    \"branch\": \"San Isidro\",\n    \"soldAt\": \"2025-01-11T14:20:00Z\"\n  },\n  {\n    \"sku\": \"OREO_GOLDEN_12\",\n    \"units\": 30,\n    \"price\": 2.99,\n    \"branch\": \"Miraflores\",\n    \"soldAt\": \"2025-01-11T16:45:00Z\"\n  },\n  {\n    \"sku\": \"OREO_MINT_12\",\n    \"units\": 20,\n    \"price\": 2.79,\n    \"branch\": \"La Molina\",\n    \"soldAt\": \"2025-01-10T11:15:00Z\"\n  },\n  {\n    \"sku\": \"OREO_PEANUT_BUTTER_12\",\n    \"units\": 18,\n    \"price\": 2.89,\n    \"branch\": \"Miraflores\",\n    \"soldAt\": \"2025-01-09T09:45:00Z\"\n  }\n]"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sales",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Generate AI Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/summary/weekly?startDate=2025-01-01&endDate=2025-01-11",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "summary", "weekly"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2025-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-01-11"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "console.log('Oreo Factory API Collection - Starting request');"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script",
+          "pm.test(\"Request completed\", function () {",
+          "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
+          "});"
+        ]
+      }
+    }
+  ]
+}
