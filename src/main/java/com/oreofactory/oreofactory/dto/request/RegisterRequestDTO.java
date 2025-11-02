@@ -1,39 +1,26 @@
 package com.oreofactory.oreofactory.dto.request;
 
-import com.oreofactory.oreofactory.model.enums.Role;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 public class RegisterRequestDTO {
-    @NotBlank(message = "Username es obligatorio.")
-    @Size(min = 3, max = 30, message = "Username 3-30 caracteres permitidos.")
-    @Pattern(regexp = "^[a-zA-Z0-9_.]*$", message = "Incluya caracteres especiales para su username.")
-    @Column(nullable = false)
+    @NotBlank(message = "Username is required")
+    @Size(min = 3, max = 30, message = "Username must be between 3 and 30 characters")
+    @Pattern(regexp = "^[a-zA-Z0-9_.]+$", message = "Username can only contain letters, numbers, underscores and dots")
     private String username;
 
-    @NotBlank
-    @Email(message = "Formato de email inválido.")
-    @Column(unique = true, nullable = false)
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
     private String email;
 
-    @Size(min=8, message = "Contraseña debe ser mínimo 8 carácteres.")
-    @NotBlank(message = "Contraseña requerida.")
-    @Column(nullable = false)
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
-    @NotBlank
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+    @NotBlank(message = "Role is required")
+    @Pattern(regexp = "ROLE_(CENTRAL|BRANCH)", message = "Role must be either ROLE_CENTRAL or ROLE_BRANCH")
+    private String role;
 
-    @Column
     private String branch;
 }

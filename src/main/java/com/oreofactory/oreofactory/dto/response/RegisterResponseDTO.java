@@ -1,22 +1,25 @@
 package com.oreofactory.oreofactory.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
-@Builder
 public class RegisterResponseDTO {
-    private int id;
+    private String token;
+    private String type = "Bearer";
+    private String message = "User registered successfully";
     private String username;
-    private String email;
-    private String role;
-    private String branch;
-    private LocalDateTime createdAt;
+    private String role; // Ahora es String para compatibilidad
 
+    public RegisterResponseDTO(String token, String username, String role) {
+        this.token = token;
+        this.username = username;
+        this.role = role;
+    }
 
+    public RegisterResponseDTO(String token, String username, String role, String message) {
+        this.token = token;
+        this.username = username;
+        this.role = role;
+        this.message = message;
+    }
 }

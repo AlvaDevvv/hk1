@@ -2,11 +2,8 @@ package com.oreofactory.oreofactory.model.entity;
 
 import com.oreofactory.oreofactory.model.enums.Role;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -21,24 +18,21 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @NotBlank
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false, length = 30)
     private String username;
 
-    @NotBlank
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String email;
 
-    @NotBlank
     @Column(nullable = false)
     private String password;
 
-    @NotBlank
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
     private String branch;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 }

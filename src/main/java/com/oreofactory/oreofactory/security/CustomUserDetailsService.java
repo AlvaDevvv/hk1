@@ -27,11 +27,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
-                getAuthorities(String.valueOf(user.getRole()))
+                getAuthorities(user.getRole())
         );
     }
 
-    private Collection<? extends GrantedAuthority> getAuthorities(String role) {
-        return Collections.singletonList(new SimpleGrantedAuthority(role));
+    private Collection<? extends GrantedAuthority> getAuthorities(com.oreofactory.oreofactory.model.enums.Role role) {
+        return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
     }
 }

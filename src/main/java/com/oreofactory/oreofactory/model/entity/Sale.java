@@ -2,10 +2,13 @@ package com.oreofactory.oreofactory.model.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -20,19 +23,21 @@ public class Sale {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @NotBlank
+    @NotBlank(message = "SKU is required")
     @Column(nullable = false)
     private String sku;
 
-    @NotBlank
+    @NotNull(message = "Units is required")
+    @Positive(message = "Units must be positive")
     @Column(nullable = false)
     private Integer units;
 
-    @NotBlank
+    @NotNull(message = "Price is required")
+    @Positive(message = "Price must be positive")
     @Column(nullable = false)
     private Double price;
 
-    @NotBlank
+    @NotBlank(message = "Branch is required")
     @Column(nullable = false)
     private String branch;
 
@@ -40,6 +45,7 @@ public class Sale {
 
     private String createdBy;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
 }

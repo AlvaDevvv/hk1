@@ -1,17 +1,19 @@
 package com.oreofactory.oreofactory.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
-@Builder
 public class LoginResponseDTO {
     private String token;
-    private int expiresIn;
-    private String role;
+    private String type = "Bearer";
+    private String username;
+    private String role; // Ahora es String para compatibilidad
     private String branch;
+
+    public LoginResponseDTO(String token, String username, String role, String branch) {
+        this.token = token;
+        this.username = username;
+        this.role = role;
+        this.branch = branch;
+    }
 }

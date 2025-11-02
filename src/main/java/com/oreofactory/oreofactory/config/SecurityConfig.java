@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,28 +30,21 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/h2-console/**").permitAll() // Para desarrollo con H2
+                        .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/sales/summary/weekly").hasAnyAuthority("ROLE_CENTRAL", "ROLE_BRANCH")
                         .requestMatchers("/sales/delete/**").hasAuthority("ROLE_CENTRAL")
                         .requestMatchers("/sales/**").hasAnyAuthority("ROLE_CENTRAL", "ROLE_BRANCH")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        // Para H2 Console en desarrollo
-        http.headers(headers -> headers.frameOptions().disable());
+        // Configuración actualizada sin métodos deprecados
+        http.headers(headers -> headers
+                .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
+        );
 
         return http.build();
-    }
-
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(customUserDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
     }
 
     @Bean

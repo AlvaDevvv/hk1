@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Date;
 
-@Component
 @Slf4j
+@Component
 public class JWTUtil {
     @Value("${jwt.secret}")
     private String secret;
@@ -64,10 +64,10 @@ public class JWTUtil {
                     .parseClaimsJws(token);
             return true;
         } catch (ExpiredJwtException e) {
-            log.error("Token expirado: {}", e.getMessage());
+            log.error("Token expired: {}", e.getMessage());
             return false;
         } catch (JwtException | IllegalArgumentException e) {
-            log.error("Token inválido: {}", e.getMessage());
+            log.error("Invalid token: {}", e.getMessage());
             return false;
         }
     }

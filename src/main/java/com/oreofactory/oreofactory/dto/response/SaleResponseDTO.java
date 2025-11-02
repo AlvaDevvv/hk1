@@ -12,11 +12,12 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class SaleResponseDTO {
-    private long id;
+    private String id;
     private String sku;
     private int units;
     private double price;
     private String branch;
     private LocalDateTime soldAt;
+    private String createdAt;
     private String createdBy;
 }
