@@ -2,12 +2,15 @@ package com.oreofactory.oreofactory.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Component
+@Slf4j
 public class JWTUtil {
     @Value("${jwt.secret}")
     private String secret;
@@ -19,7 +22,11 @@ public class JWTUtil {
     private Long refreshExpiration;
 
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
+        // Asegurar que la clave tenga al menos 256 bits (32 caracteres)
+        String safeSecret = secret.length() < 32 ?
+                String.format("%-32s", secret).replace(' ', '0') : // Padding si es muy corta
+                secret.substring(0, 32); // Truncar si es muy larga
+        return Keys.hmacShaKeyFor(safeSecret.getBytes());
     }
 
     public String generateToken(String username) {
@@ -56,7 +63,11 @@ public class JWTUtil {
                     .build()
                     .parseClaimsJws(token);
             return true;
+        } catch (ExpiredJwtException e) {
+            log.error("Token expirado: {}", e.getMessage());
+            return false;
         } catch (JwtException | IllegalArgumentException e) {
+            log.error("Token inválido: {}", e.getMessage());
             return false;
         }
     }

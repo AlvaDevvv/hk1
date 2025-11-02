@@ -17,4 +17,6 @@ public class RegisterResponseDTO {
     private String role;
     private String branch;
     private LocalDateTime createdAt;
+
+
 }

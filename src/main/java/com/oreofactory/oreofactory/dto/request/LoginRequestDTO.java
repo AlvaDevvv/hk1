@@ -5,7 +5,15 @@ import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class LoginRequestDTO {
     @NotBlank(message = "Username es obligatorio.")
     @Size(min = 3, max = 30, message = "Username 3-30 caracteres permitidos.")
